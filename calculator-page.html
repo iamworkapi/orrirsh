@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enterprise Measurement Converter Dashboard</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body
+    class="bg-slate-900 text-slate-100 font-sans min-h-screen flex items-center justify-center p-4 lg:p-8"
+  >
+    <div
+      class="w-full max-w-6xl bg-slate-800/50 rounded-3xl border border-slate-700/60 shadow-2xl backdrop-blur-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[680px]"
+    >
+      <!-- LEFT SIDE: REFERENCE METRICS TABLES & CONTENT -->
+      <div
+        class="lg:col-span-7 p-6 lg:p-8 bg-slate-800 border-b lg:border-b-0 lg:border-r border-slate-700/60 flex flex-col justify-between space-y-6"
+      >
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <span
+              class="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-xl border border-indigo-500/20"
+            >
+              <i data-lucide="book-open" class="w-5 h-5"></i>
+            </span>
+            <h2 class="text-xl font-bold tracking-tight text-white">
+              Standard Matrix Lookup
+            </h2>
+          </div>
+          <p class="text-sm text-slate-400 leading-relaxed mb-6">
+            Quickly audit core unit equivalencies. Select a category below to
+            change both the active calculator module and its accompanying
+            reference matrix view.
+          </p>
+
+          <!-- Navigation Tabs inside Content Window -->
+          <div
+            class="grid grid-cols-3 gap-2 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-700/40 mb-6"
+          >
+            <button
+              id="tab-distance"
+              onclick="switchTab('distance')"
+              class="py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-indigo-600 text-white shadow-md"
+            >
+              <i data-lucide="ruler" class="w-4 h-4"></i>
+              Distance
+            </button>
+            <button
+              id="tab-volume"
+              onclick="switchTab('volume')"
+              class="py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-700/30"
+            >
+              <i data-lucide="droplet" class="w-4 h-4"></i>
+              Volume
+            </button>
+            <button
+              id="tab-weight"
+              onclick="switchTab('weight')"
+              class="py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-700/30"
+            >
+              <i data-lucide="scale" class="w-4 h-4"></i>
+              Weight
+            </button>
+          </div>
+
+          <!-- Interactive Data Tables Window -->
+          <div
+            class="bg-slate-900/40 rounded-2xl border border-slate-700/40 overflow-hidden"
+          >
+            <div class="max-h-[340px] overflow-y-auto custom-scrollbar">
+              <table
+                id="matrix-table"
+                class="w-full text-left text-sm border-collapse"
+              >
+                <!-- Dynamic rows injected here from JS based on image charts -->
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Context Info Footer -->
+        <div
+          class="pt-4 border-t border-slate-700/40 flex gap-3 text-xs text-slate-400"
+        >
+          <i
+            data-lucide="shield-check"
+            class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"
+          ></i>
+          <p>
+            Calculations adhere strictly to International System of Units (SI)
+            specifications and certified global conversion standards.
+          </p>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE: PROFESSIONAL CONVERTER UTILITY -->
+      <div
+        class="lg:col-span-5 p-6 lg:p-8 flex flex-col justify-center bg-gradient-to-b from-slate-800/20 to-slate-900/20"
+      >
+        <div class="space-y-6">
+          <div>
+            <h3
+              id="converter-title"
+              class="text-lg font-bold text-white tracking-wide"
+            >
+              Distance Converter
+            </h3>
+            <p
+              class="text-xs text-indigo-400 font-medium tracking-wider uppercase mt-1"
+            >
+              Real-time Node Engine
+            </p>
+          </div>
+
+          <!-- Input Unit Group -->
+          <div class="space-y-2">
+            <label
+              class="text-xs font-semibold text-slate-400 uppercase tracking-wider block"
+              >Source Value</label
+            >
+            <div class="flex gap-2">
+              <input
+                id="input-value"
+                type="number"
+                value="1"
+                oninput="calculate()"
+                class="w-2/3 bg-slate-900/80 border border-slate-700/80 rounded-xl px-4 py-3.5 text-lg font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/80 focus:border-transparent transition-all"
+              />
+              <select
+                id="select-from"
+                onchange="calculate()"
+                class="w-1/3 bg-slate-900/80 border border-slate-700/80 rounded-xl px-2 py-3.5 text-sm font-semibold text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/80 cursor-pointer"
+              >
+                <!-- Injected JS Options -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Interactive Swap Mechanism -->
+          <div class="flex justify-center -my-2">
+            <button
+              onclick="swapUnits()"
+              class="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl border border-indigo-400/20 transition-all duration-200 shadow-lg shadow-indigo-600/20 hover:scale-105 active:scale-95 group"
+              title="Swap Configuration"
+            >
+              <i
+                data-lucide="arrow-up-down"
+                class="w-4 h-4 transform group-hover:rotate-180 transition-transform duration-300"
+              ></i>
+            </button>
+          </div>
+
+          <!-- Output Unit Group -->
+          <div class="space-y-2">
+            <label
+              class="text-xs font-semibold text-slate-400 uppercase tracking-wider block"
+              >Target Output</label
+            >
+            <div class="flex gap-2">
+              <input
+                id="output-value"
+                type="text"
+                readonly
+                class="w-2/3 bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-3.5 text-lg font-bold text-emerald-400 select-all focus:outline-none"
+              />
+              <select
+                id="select-to"
+                onchange="calculate()"
+                class="w-1/3 bg-slate-900/80 border border-slate-700/80 rounded-xl px-2 py-3.5 text-sm font-semibold text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/80 cursor-pointer"
+              >
+                <!-- Injected JS Options -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Live Evaluation Card -->
+          <div
+            class="bg-slate-900/60 border border-slate-700/40 rounded-2xl p-4 flex items-start gap-3"
+          >
+            <i
+              data-lucide="info"
+              class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5"
+            ></i>
+            <div class="text-xs text-slate-400 leading-relaxed">
+              <span class="font-bold text-slate-200 block mb-0.5"
+                >Automated Precision Scaling</span
+              >
+              Values auto-format to 5 decimal limits. Micro-scale integers
+              dynamically route into standard clean scientific notations.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Standardized data relative to base metrics, mapped from image_b24a5e.png and image_b245a9.png
+      const unitData = {
+        distance: {
+          title: "Distance Converter",
+          base: "meter",
+          tableData: [
+            ["1 inch", "= 2.54 centimeters", "= 25.4 millimeters"],
+            ["1 foot", "= 0.305 meter", "= 30.48 centimeters"],
+            ["1 yard", "= 0.9144 meter", ""],
+            ["1 mile", "= 1.61 kilometers", "= 5,280 feet"],
+            ["1 kilometer", "= 1,000 meters", "= 0.6214 mile"],
+            ["1 meter", "= 100 centimeters", "= 1,000 millimeters"],
+            ["1 meter", "= 3.28 feet", ""],
+            ["1 centimeter", "= 0.3937 inch", "= 10 millimeters"],
+            ["1 millimeter", "= 0.039 inch", "= 0.1 centimeter"],
+            ["1 micron", "1 micron", "= 10⁻⁶ meter"],
+            ["10⁻⁶ meter", "= 1 micrometer", ""],
+          ],
+          units: {
+            meter: { name: "Meters (m)", factor: 1 },
+            inch: { name: "Inches (in)", factor: 0.0254 },
+            foot: { name: "Feet (ft)", factor: 0.3048 },
+            yard: { name: "Yards (yd)", factor: 0.9144 },
+            mile: { name: "Miles (mi)", factor: 1609.344 },
+            kilometer: { name: "Kilometers (km)", factor: 1000 },
+            centimeter: { name: "Centimeters (cm)", factor: 0.01 },
+            millimeter: { name: "Millimeters (mm)", factor: 0.001 },
+            micrometer: { name: "Micrometers (µm)", factor: 0.000001 },
+          },
+        },
+        volume: {
+          title: "Volume Converter",
+          base: "litre",
+          tableData: [
+            ["1 kilolitre", "= 1,000 litres", "= 1 cubic meter"],
+            ["1 litre", "= 1,000 millilitres", "= 1,000 cc"],
+            ["1 millilitre", "= 1 cc", "(exactly 1.000027cc)"],
+            ["1 fluid ounce", "= 29.57 millilitres", ""],
+            ["1 US gallon", "= 3.785 litres", ""],
+            ["1 imperial gallon", "= 4.546 litres", ""],
+          ],
+          units: {
+            litre: { name: "Litres (L)", factor: 1 },
+            kilolitre: { name: "Kilolitres (kL)", factor: 1000 },
+            cubic_meter: { name: "Cubic Meters (m³)", factor: 1000 },
+            millilitre: { name: "Millilitres (mL / cc)", factor: 0.001 },
+            fluid_ounce: { name: "US Fluid Ounces", factor: 0.0295735 },
+            us_gallon: { name: "US Gallons (gal)", factor: 3.78541 },
+            imperial_gallon: { name: "Imperial Gallons", factor: 4.54609 },
+          },
+        },
+        weight: {
+          title: "Weight Converter",
+          base: "gram",
+          tableData: [
+            ["1 kilogram", "= 1,000 grams", "= 2.2 pounds"],
+            ["1 gram", "= 1,000 milligrams", "= 1,000 milligrams"],
+            ["1 milligram", "= 1,000 micrograms", "= 1/1,000 gram"],
+            ["1 microgram", "= 10⁻⁶ grams", "= 1/1/000 milligram"],
+            ["1 nanogram", "= 10⁻⁹ grams", "= 1/1,000 microgram"],
+            ["1 pound", "= 0.45 kilogram", "= 16 ounces"],
+            ["1 ounce", "= 28.35 grams", ""],
+          ],
+          units: {
+            gram: { name: "Grams (g)", factor: 1 },
+            kilogram: { name: "Kilograms (kg)", factor: 1000 },
+            milligram: { name: "Milligrams (mg)", factor: 0.001 },
+            microgram: { name: "Micrograms (µg)", factor: 0.000001 },
+            nanogram: { name: "Nanograms (ng)", factor: 0.000000001 },
+            pound: { name: "Pounds (lb)", factor: 453.59237 },
+            ounce: { name: "Ounces (oz)", factor: 28.34952 },
+          },
+        },
+      };
+
+      let currentMode = "distance";
+
+      // Bootstrapping App
+      function init() {
+        lucide.createIcons();
+        renderTable();
+        populateSelects();
+        calculate();
+      }
+
+      // Handle structural layout tab switching
+      function switchTab(mode) {
+        currentMode = mode;
+        const tabs = ["distance", "volume", "weight"];
+
+        tabs.forEach((t) => {
+          const tabBtn = document.getElementById(`tab-${t}`);
+          if (t === mode) {
+            tabBtn.className =
+              "py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-indigo-600 text-white shadow-md";
+          } else {
+            tabBtn.className =
+              "py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-700/30";
+          }
+        });
+
+        document.getElementById("converter-title").innerText =
+          unitData[currentMode].title;
+
+        renderTable();
+        populateSelects();
+        calculate();
+      }
+
+      // Render high-fidelity lookup grid
+      function renderTable() {
+        const tableElement = document.getElementById("matrix-table");
+        const dataRows = unitData[currentMode].tableData;
+
+        let htmlStr = "";
+        dataRows.forEach((row, idx) => {
+          const rowBg = idx % 2 === 0 ? "bg-slate-900/20" : "bg-transparent";
+          htmlStr += `<tr class="${rowBg} hover:bg-slate-700/20 transition-colors border-b border-slate-800/60">
+                    <td class="px-4 py-3 font-semibold text-white text-xs sm:text-sm">${row[0]}</td>
+                    <td class="px-4 py-3 text-slate-300 text-xs sm:text-sm">${row[1]}</td>
+                    <td class="px-4 py-3 text-slate-400 text-xs sm:text-sm">${row[2]}</td>
+                </tr>`;
+        });
+        tableElement.innerHTML = htmlStr;
+      }
+
+      // Dynamic element hydration
+      function populateSelects() {
+        const fromSelect = document.getElementById("select-from");
+        const toSelect = document.getElementById("select-to");
+        const units = unitData[currentMode].units;
+
+        fromSelect.innerHTML = "";
+        toSelect.innerHTML = "";
+
+        Object.keys(units).forEach((key, index) => {
+          const optFrom = new Option(units[key].name, key);
+          const optTo = new Option(units[key].name, key);
+
+          if (index === 0) optFrom.selected = true;
+          if (index === 1) optTo.selected = true;
+
+          fromSelect.add(optFrom);
+          toSelect.add(optTo);
+        });
+      }
+
+      // Compute conversions instantly
+      function calculate() {
+        const value = parseFloat(document.getElementById("input-value").value);
+        const fromUnit = document.getElementById("select-from").value;
+        const toUnit = document.getElementById("select-to").value;
+        const outputField = document.getElementById("output-value");
+
+        if (isNaN(value)) {
+          outputField.value = "";
+          return;
+        }
+
+        const units = unitData[currentMode].units;
+        const valueInBase = value * units[fromUnit].factor;
+        const finalValue = valueInBase / units[toUnit].factor;
+
+        if (finalValue === 0) {
+          outputField.value = 0;
+        } else if (
+          Math.abs(finalValue) < 0.00001 ||
+          Math.abs(finalValue) > 10000000
+        ) {
+          outputField.value = finalValue.toExponential(4);
+        } else {
+          outputField.value = Number(finalValue.toFixed(5));
+        }
+      }
+
+      // Fluid layout orientation swap
+      function swapUnits() {
+        const fromSelect = document.getElementById("select-from");
+        const toSelect = document.getElementById("select-to");
+        const inputValue = document.getElementById("input-value");
+        const outputValue = document.getElementById("output-value");
+
+        const tempUnit = fromSelect.value;
+        fromSelect.value = toSelect.value;
+        toSelect.value = tempUnit;
+
+        if (outputValue.value !== "" && !outputValue.value.includes("e")) {
+          inputValue.value = outputValue.value;
+        }
+
+        calculate();
+      }
+
+      window.onload = init;
+    </script>
+    <style>
+      /* Premium minimalistic track sizing */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+      }
+    </style>
+  </body>
+</html>
