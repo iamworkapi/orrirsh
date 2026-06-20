@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Download Center - Logistics Resource Portal</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 font-sans min-h-screen transition-colors duration-300">
+
+    <!-- Top Premium Navigation Bar Header -->
+  
+
+    <!-- Main Workspace Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Welcome banner & live fuzzy searching deck area -->
+        <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-6 md:p-8 text-white shadow-xl mb-8 relative overflow-hidden border border-slate-800">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-white pointer-events-none">
+                <i data-lucide="download-cloud" class="w-64 h-64"></i>
+            </div>
+            <div class="relative z-10 max-w-2xl">
+                <span class="text-xs font-bold text-orange-400 uppercase tracking-widest px-2.5 py-1 rounded-md bg-orange-500/10 border border-orange-500/20">Compliance & Operations Hub</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight mt-3 text-white">Document Download Center</h2>
+                <p class="text-sm text-slate-300 mt-2 leading-relaxed">
+                    Access and query crucial custom declarations, annexures, courier SLIs, affidavits, and standard shipping templates instantly.
+                </p>
+                
+                <!-- Search inputs integration inside banner element -->
+                <div class="mt-6 flex max-w-md bg-white dark:bg-slate-900 rounded-xl p-1.5 border border-slate-200 dark:border-slate-700 shadow-lg group focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+                    <span class="flex items-center pl-3 text-slate-400"><i data-lucide="search" class="w-4 h-4"></i></span>
+                    <input id="search-input" oninput="filterDocuments()" type="text" placeholder="Search forms (e.g. Annexure, SLI, Bank Letter)..." class="w-full bg-transparent px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none">
+                </div>
+            </div>
+        </div>
+
+        <!-- Divided Segment Content Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <!-- LEFT PANEL: CATEGORY SWITCH PANEL FILTERS (1 Column) -->
+            <div class="lg:col-span-1 space-y-2">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-3 block mb-1">Categories</span>
+                <div class="bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/40 p-2 rounded-2xl flex flex-col gap-1 shadow-xs" id="category-sidebar">
+                    <button onclick="setCategory('all')" id="cat-all" class="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-between bg-blue-600 text-white shadow-sm"><span class="flex items-center gap-2.5"><i data-lucide="folder-open" class="w-4 h-4"></i> Complete Repository</span></button>
+                    <button onclick="setCategory('sli')" id="cat-sli" class="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-between text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"><span class="flex items-center gap-2.5"><i data-lucide="plane-takeoff" class="w-4 h-4"></i> Courier SLIs</span></button>
+                    <button onclick="setCategory('annexure')" id="cat-annexure" class="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-between text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"><span class="flex items-center gap-2.5"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Annexures & DEEC</span></button>
+                    <button onclick="setCategory('declaration')" id="cat-declaration" class="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-between text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"><span class="flex items-center gap-2.5"><i data-lucide="file-text" class="w-4 h-4"></i> Custom Declarations</span></button>
+                    <button onclick="setCategory('general')" id="cat-general" class="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-between text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"><span class="flex items-center gap-2.5"><i data-lucide="briefcase" class="w-4 h-4"></i> Bank & Invoices</span></button>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: DOCUMENTS DYNAMIC GRID GRID (3 Columns) -->
+            <div class="lg:col-span-3">
+                <div class="flex items-center justify-between mb-4 px-1">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest" id="results-count">Showing All Documents</span>
+                    <span class="text-xs text-slate-400 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-500"></i> Vault Verified</span>
+                </div>
+
+                <!-- Document Presentation Array -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="documents-grid">
+                    <!-- Javascript populates cards instantly here -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- INTUITION FILE LIGHTBOX MODAL VIEWER INTERFACE COMPONENT -->
+    <div id="viewer-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md transition-all duration-300">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200">
+            <!-- Modal Actions Control Header -->
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950/40">
+                <div class="flex items-center gap-3">
+                    <span id="modal-icon-wrapper" class="p-2 rounded-xl text-white"></span>
+                    <div>
+                        <h3 id="modal-title" class="font-bold text-slate-900 dark:text-white text-sm sm:text-base line-clamp-1">Document Inspector View</h3>
+                        <p id="modal-subtitle" class="text-xs text-slate-400 font-medium">Pre-rendered Workspace Mockup</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="modal-download-btn" class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-xs transition-colors">
+                        <i data-lucide="download" class="w-4 h-4"></i> Download Form
+                    </button>
+                    <button onclick="closeModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pre-rendered Canvas Viewer Window inside lightbox -->
+            <div class="flex-1 bg-slate-100 dark:bg-slate-950 p-6 sm:p-12 overflow-y-auto flex items-center justify-center relative custom-scrollbar">
+                <!-- Watermark graphic framework -->
+                <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] grid grid-cols-4 gap-4 p-4 pointer-events-none select-none">
+                    <div class="text-center font-bold text-xs uppercase tracking-widest rotate-12 self-center">ADI WORLDWIDE</div>
+                    <div class="text-center font-bold text-xs uppercase tracking-widest rotate-12 self-center">ADI WORLDWIDE</div>
+                    <div class="text-center font-bold text-xs uppercase tracking-widest rotate-12 self-center">ADI WORLDWIDE</div>
+                    <div class="text-center font-bold text-xs uppercase tracking-widest rotate-12 self-center">ADI WORLDWIDE</div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 max-w-xl w-full border border-slate-200 dark:border-slate-800 shadow-md text-center space-y-4 relative z-10">
+                    <div id="modal-preview-avatar" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto text-white shadow-md"></div>
+                    <h4 id="modal-preview-heading" class="text-lg font-extrabold text-slate-900 dark:text-white"></h4>
+                    <p class="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+                        This view initiates an encapsulated container displaying form fields, regulatory guidelines, and signature panels ready for verification processing.
+                    </p>
+                    <div class="pt-4 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-3 gap-2 text-left">
+                        <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">File Integrity</p><p class="text-xs font-semibold text-slate-700 dark:text-slate-300">Secure (SSL)</p></div>
+                        <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Verification</p><p class="text-xs font-semibold text-slate-700 dark:text-slate-300">ISO 9001</p></div>
+                        <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Encoding</p><p class="text-xs font-semibold text-slate-700 dark:text-slate-300">UTF-8 Spec</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Meticulous document dataset mapped with clean classification directly from image_a4a2de.png layout blocks
+        const documentRegistry = [
+            // -- GROUP: Courier SLIs (Column 1 from reference image) --
+            { name: "FEDEXSLI", cat: "sli", format: "pdf", size: "245 KB", bg: "bg-red-500", icon: "file-text" },
+            { name: "TNT ODA", cat: "sli", format: "excel", size: "112 KB", bg: "bg-emerald-500", icon: "file-spreadsheet" },
+            { name: "DHL SLI", cat: "sli", format: "word", size: "184 KB", bg: "bg-blue-500", icon: "file-text" },
+            { name: "TNTSLI", cat: "sli", format: "pdf", size: "310 KB", bg: "bg-red-500", icon: "file-text" },
+            { name: "UPS SLI", cat: "sli", format: "excel", size: "94 KB", bg: "bg-emerald-500", icon: "file-spreadsheet" },
+            { name: "Annexure D For Depb Declaration", cat: "sli", format: "pdf", size: "412 KB", bg: "bg-red-500", icon: "file-text" },
+            { name: "Material Safety Data Sheet (MSDS)", cat: "sli", format: "pdf", size: "1.4 MB", bg: "bg-red-500", icon: "shield-alert" },
+
+            // -- GROUP: Annexures & Appendices (Column 2 from reference image) --
+            { name: "ANNEXURE - I FOR DRAWBACK", cat: "annexure", format: "excel", size: "140 KB", bg: "bg-emerald-500", icon: "file-spreadsheet" },
+            { name: "ANNEXURE - II FOR DRAWBACK", cat: "annexure", format: "excel", size: "148 KB", bg: "bg-emerald-500", icon: "file-spreadsheet" },
+            { name: "ANNEXURE C1 FOR EOU ANNEXURE A", cat: "annexure", format: "word", size: "215 KB", bg: "bg-blue-500", icon: "file-text" },
+            { name: "APPENDIX II FOR DEEC", cat: "annexure", format: "pdf", size: "290 KB", bg: "bg-red-500", icon: "file-text" },
+            { name: "APPENDIX III FOR DRAWBACK", cat: "annexure", format: "excel", size: "165 KB", bg: "bg-emerald-500", icon: "file-spreadsheet" },
+
+            // -- GROUP: Declarations & Certifications (Columns 3 & 4 from reference image) --
+            { name: "MOP AFFIDAVIT", cat: "declaration", format: "word", size: "88 KB", bg: "bg-blue-500", icon: "file-text" },
+            { name: "MULTIPLE COUNTRY DECLARATION", cat: "declaration", format: "pdf", size: "340 KB", bg: "bg-red-500", icon: "file-text" },
+            { name: "NEGATIVE DECLARATION", cat: "declaration", format: "pdf", size: "115 KB", bg: "bg-red-500", icon: "file-text" },
+            { name: "SHIPPER'S CERTIFICATE FOR NON-HAZARDOUS CARGO", cat: "declaration", format: "pdf", size: "520 KB", bg: "bg-red-500", icon: "shield-check" },
+            { name: "QUOTA CHARGE STATEMENT", cat: "declaration", format: "excel", size: "195 KB", bg: "bg-emerald-500", icon: "file-spreadsheet" },
+            { name: "SDF FORM", cat: "declaration", format: "word", size: "74 KB", bg: "bg-blue-500", icon: "file-text" },
+            { name: "SINGLE COUNTRY DECLARATION", cat: "declaration", format: "pdf", size: "210 KB", bg: "bg-red-500", icon: "file-text" },
+            { name: "TSCA CERTIFICATE", cat: "declaration", format: "pdf", size: "185 KB", bg: "bg-red-500", icon: "file-text" },
+            { name: "VARIOUS DRAWBACK DECLARATIONS", cat: "declaration", format: "word", size: "440 KB", bg: "bg-blue-500", icon: "file-text" },
+
+            // -- GROUP: General Forms, Bank Documents & Invoices (Columns 3, 4 & 5 from reference image) --
+            { name: "PACKING LIST", cat: "general", format: "excel", size: "85 KB", bg: "bg-emerald-500", icon: "file-spreadsheet" },
+            { name: "INVOICE TEMPLATE", cat: "general", format: "excel", size: "130 KB", bg: "bg-emerald-500", icon: "file-spreadsheet" },
+            { name: "BANK LETTER", cat: "general", format: "word", size: "92 KB", bg: "bg-blue-500", icon: "file-text" },
+            { name: "BANK WAIVER FOR REPAIR & RETURN", cat: "general", format: "word", size: "118 KB", bg: "bg-blue-500", icon: "file-text" },
+            { name: "DECLARATION OF BIOLOGICAL SHIPMENT", cat: "general", format: "pdf", size: "610 KB", bg: "bg-red-500", icon: "activity" },
+            { name: "FOOTWEAR DECLARATION", cat: "general", format: "pdf", size: "205 KB", bg: "bg-red-500", icon: "file-text" },
+            { name: "INDEMNITY CERTIFICATE", cat: "general", format: "word", size: "104 KB", bg: "bg-blue-500", icon: "file-text" }
+        ];
+
+        let activeCategory = 'all';
+
+        function init() {
+            renderDocuments();
+            lucide.createIcons();
+        }
+
+        function toggleTheme() {
+            const documentHtml = document.documentElement;
+            if (documentHtml.classList.contains('dark')) {
+                documentHtml.classList.remove('dark');
+                documentHtml.classList.add('light');
+            } else {
+                documentHtml.classList.remove('light');
+                documentHtml.classList.add('dark');
+            }
+        }
+
+        function setCategory(category) {
+            activeCategory = category;
+            const categories = ['all', 'sli', 'annexure', 'declaration', 'general'];
+            
+            categories.forEach(cat => {
+                const sidebarButton = document.getElementById(`cat-${cat}`);
+                if (cat === category) {
+                    sidebarButton.className = "w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-between bg-blue-600 text-white shadow-sm";
+                } else {
+                    sidebarButton.className = "w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-between text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60";
+                }
+            });
+            renderDocuments();
+        }
+
+        function filterDocuments() {
+            renderDocuments();
+        }
+
+        // High UX presentation card generation matrix matching orange accents
+        function renderDocuments() {
+            const grid = document.getElementById('documents-grid');
+            const searchTerms = document.getElementById('search-input').value.toLowerCase().trim();
+            let htmlBuffer = '';
+            let elementCounter = 0;
+
+            documentRegistry.forEach((doc, index) => {
+                if (activeCategory !== 'all' && doc.cat !== activeCategory) return;
+                if (searchTerms !== '' && !doc.name.toLowerCase().includes(searchTerms)) return;
+
+                elementCounter++;
+
+                // Format extension tags matching corporate rules
+                let formatTagColor = "bg-red-500/10 text-red-500 border-red-500/20";
+                if(doc.format === 'excel') formatTagColor = "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
+                if(doc.format === 'word') formatTagColor = "bg-blue-500/10 text-blue-500 border-blue-500/20";
+
+                htmlBuffer += `
+                    <div class="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 p-5 rounded-2xl transition-all duration-200 hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 flex flex-col justify-between space-y-4 group">
+                        <div class="flex items-start gap-3">
+                            <div class="p-3 ${doc.bg} text-white rounded-xl shadow-xs shrink-0">
+                                <i data-lucide="${doc.icon}" class="w-5 h-5"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${formatTagColor}">${doc.format}</span>
+                                <h3 class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2 mt-1.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" title="${doc.name}">${doc.name}</h3>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/60">
+                            <span class="text-xs font-semibold text-slate-400">${doc.size}</span>
+                            <div class="flex gap-1.5">
+                                <button onclick="viewDocument(${index})" class="p-2 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-1" title="Instant Inspector View">
+                                    <i data-lucide="eye" class="w-4 h-4"></i> View
+                                </button>
+                                <button onclick="triggerDownload('${doc.name}', '${doc.format}')" class="p-2 rounded-lg text-xs font-bold text-orange-500 hover:bg-orange-500/10 transition-all flex items-center gap-1" title="Download Document to local drive">
+                                    <i data-lucide="download" class="w-4 h-4"></i> Get
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('results-count').innerText = `Displaying ${elementCounter} forms matches`;
+            grid.innerHTML = htmlBuffer === '' 
+                ? `<div class="col-span-full py-12 text-center text-slate-400"><i data-lucide="folder-search" class="w-12 h-12 mx-auto mb-2 opacity-30"></i> No compliance matches found matching queries.</div>`
+                : htmlBuffer;
+            
+            lucide.createIcons();
+        }
+
+        // Direct simulated local disk downloader mechanism
+        function triggerDownload(name, extension) {
+            // High UX validation toast indicator placeholder simulated via warning alerts
+            alert(`Initiating download stream: ${name}.${extension === 'excel' ? 'xlsx' : extension === 'word' ? 'docx' : 'pdf'}`);
+        }
+
+        // Interactive View Lightbox Modal activation matrix
+        function viewDocument(index) {
+            const data = documentRegistry[index];
+            const modal = document.getElementById('viewer-modal');
+            
+            document.getElementById('modal-title').innerText = `${data.name}`;
+            document.getElementById('modal-preview-heading').innerText = `${data.name}`;
+            
+            const avatar = document.getElementById('modal-preview-avatar');
+            avatar.className = `w-16 h-16 rounded-full flex items-center justify-center mx-auto text-white shadow-md ${data.bg}`;
+            avatar.innerHTML = `<i data-lucide="${data.icon}" class="w-8 h-8"></i>`;
+
+            const wrapper = document.getElementById('modal-icon-wrapper');
+            wrapper.className = `p-2 rounded-xl text-white ${data.bg}`;
+            wrapper.innerHTML = `<i data-lucide="${data.icon}" class="w-4 h-4"></i>`;
+
+            document.getElementById('modal-download-btn').onclick = function() {
+                triggerDownload(data.name, data.format);
+            };
+
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('viewer-modal').classList.add('hidden');
+        }
+
+        window.onload = init;
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+    </style>
+</body>
+</html>
